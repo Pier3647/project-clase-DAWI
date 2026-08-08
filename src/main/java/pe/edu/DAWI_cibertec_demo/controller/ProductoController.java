@@ -1,6 +1,9 @@
 package pe.edu.DAWI_cibertec_demo.controller;
 
 import lombok.Data;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.DAWI_cibertec_demo.model.Producto;
@@ -44,4 +47,27 @@ public class ProductoController {
                     return ResponseEntity.ok(actualizado);
                 }).orElse(ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/buscarPorNombre")
+    public ResponseEntity<List<Producto>> buscarPorNombre(@RequestParam String texto){
+        List<Producto> resultados = productoRepository.buscarPorNombre(texto);
+        if(resultados.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(resultados);
+    }
+
+    @GetMapping("/buscar")
+    public Page<Producto> buscar(
+            @RequestParam String nombre,
+            @RequestParam int page,
+            @RequestParam int size
+    ){
+        Pageable pageable = PageRequest.of(page, size);
+        return productoRepository.findByNombreContainingIgnoreCase(nombre, pageable);
+    }
+
+
+
+
 }
